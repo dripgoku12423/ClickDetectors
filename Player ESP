@@ -1,0 +1,91 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local GREEN = Color3.fromRGB(0, 255, 0) -- Player ESP
+local RED = Color3.fromRGB(255, 0, 0)   -- Banana ESP
+
+-- ========= PLAYER ESP =========
+local function applyPlayerESP(player)
+	if player.Name == "plsaddmeIneedurhel_P" then return end -- Skip self
+
+	local function highlightCharacter(char)
+		local hrp = char:WaitForChild("HumanoidRootPart", 5)
+		if not hrp then return end
+
+		-- Remove old ESP
+		local old = char:FindFirstChild("PlayerESP")
+		if old then old:Destroy() end
+
+		-- New highlight
+		local esp = Instance.new("Highlight")
+		esp.Name = "PlayerESP"
+		esp.Adornee = char
+		esp.FillColor = GREEN
+		esp.OutlineColor = GREEN
+		esp.FillTransparency = 0.5
+		esp.OutlineTransparency = 0
+		esp.Parent = char
+	end
+
+	player.CharacterAdded:Connect(highlightCharacter)
+
+	if player.Character then
+		highlightCharacter(player.Character)
+	end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		applyPlayerESP(player)
+	end
+end
+
+Players.PlayerAdded:Connect(applyPlayerESP)
+
+-- ========= BANANA ESP =========
+local function highlightBananaSkins()
+	local gameBananas = workspace:FindFirstChild("GameBananas")
+	if not gameBananas then
+		warn("GameBananas folder not found!")
+		return
+	end
+
+	for _, playerFolder in ipairs(gameBananas:GetChildren()) do
+		for _, child in ipairs(playerFolder:GetChildren()) do
+			if string.lower(child.Name):sub(1, 6) == "banana" then
+				local adornee = nil
+
+				if child:IsA("Model") then
+					adornee = child
+				elseif child:IsA("BasePart") then
+					local wrapper = Instance.new("Model")
+					wrapper.Name = child.Name .. "_Wrapper"
+					child.Parent = wrapper
+					wrapper.Parent = playerFolder
+					adornee = wrapper
+				end
+
+				if adornee and not adornee:FindFirstChild("Highlight") then
+					local highlight = Instance.new("Highlight")
+					highlight.Name = "Highlight"
+					highlight.FillColor = RED
+					highlight.OutlineColor = RED
+					highlight.FillTransparency = 0.3
+					highlight.OutlineTransparency = 0
+					highlight.Adornee = adornee
+					highlight.Parent = adornee
+				end
+			end
+		end
+	end
+end
+
+-- Run on start
+highlightBananaSkins()
+
+-- Update when new bananas appear
+workspace:WaitForChild("GameBananas").ChildAdded:Connect(function()
+	wait(0.1)
+	highlightBananaSkins()
+end)
