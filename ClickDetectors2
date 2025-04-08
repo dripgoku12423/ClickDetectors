@@ -1,0 +1,36 @@
+-- Highlight CakePlate and Puzzles
+local function highlightAllCakePlates()
+    local itemsFolder = workspace:FindFirstChild("GameKeeper") and workspace.GameKeeper:FindFirstChild("Map") and workspace.GameKeeper.Map:FindFirstChild("Items")
+    if itemsFolder then
+        for _, item in ipairs(itemsFolder:GetChildren()) do
+            if item.Name == "CakePlate" then
+                local highlight = Instance.new("Highlight")
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 0)  -- Yellow
+                highlight.FillTransparency = 0.5
+                highlight.Parent = item
+            end
+        end
+    else
+        print("Items folder NOT found!")
+    end
+end
+
+local function highlightAllPuzzles()
+    local puzzleFolder = workspace:FindFirstChild("GameKeeper") and workspace.GameKeeper:FindFirstChild("Puzzles")
+    if puzzleFolder then
+        for _, puzzle in ipairs(puzzleFolder:GetChildren()) do
+            if puzzle:IsA("Model") then
+                local highlight = Instance.new("Highlight")
+                highlight.OutlineColor = Color3.fromRGB(255, 0, 255)  -- Magenta
+                highlight.FillTransparency = 0.5
+                highlight.Parent = puzzle
+            end
+        end
+    else
+        print("Puzzle folder NOT found!")
+    end
+end
+
+-- Call the functions to highlight manually
+highlightAllPuzzles()
+highlightAllCakePlates()
