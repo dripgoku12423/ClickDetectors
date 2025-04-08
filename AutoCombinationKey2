@@ -1,0 +1,34 @@
+local Workspace = game:GetService("Workspace")
+local StarterGui = game:GetService("StarterGui")
+
+-- Function to get the combination code from the buttons
+local function getCombinationCode()
+    local buttons = {
+        Workspace.GameKeeper.Puzzles.CombinationPuzzle.CombinationKey.Buttons.Button1.ButtonLabel.Label,
+        Workspace.GameKeeper.Puzzles.CombinationPuzzle.CombinationKey.Buttons.Button2.ButtonLabel.Label,
+        Workspace.GameKeeper.Puzzles.CombinationPuzzle.CombinationKey.Buttons.Button3.ButtonLabel.Label,
+    }
+
+    local code = ""
+    for _, button in ipairs(buttons) do
+        if button and tonumber(button.Text) then
+            code = code .. button.Text
+        else
+            StarterGui:SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid combination code!",
+                Duration = 5
+            })
+            return
+        end
+    end
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "Combination Code",
+        Text = "Code: " .. code,
+        Duration = 5
+    })
+end
+
+-- Call the function directly to find the code
+getCombinationCode()
