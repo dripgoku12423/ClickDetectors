@@ -1,0 +1,124 @@
+-- Version: Persistent GUI Script (Even Smaller GUI)
+local StarterGui = game:GetService("StarterGui")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+
+-- Function to create the GUI
+local function createGUI()
+    local player = Players.LocalPlayer
+    local screenGui = player.PlayerGui:FindFirstChild("CodeDetectorGUI")
+    
+    -- Destroy existing GUI if it already exists
+    if screenGui then
+        screenGui:Destroy()
+    end
+
+    screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    screenGui.Name = "CodeDetectorGUI"
+
+    local mainFrame = Instance.new("Frame", screenGui)
+    mainFrame.Size = UDim2.new(0, 200, 0, 120)  -- Further reduced size
+    mainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)  -- Centered position for smaller size
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Active = true -- Make the frame interactive
+    mainFrame.Draggable = true -- Enable dragging
+
+    local titleLabel = Instance.new("TextLabel", mainFrame)
+    titleLabel.Size = UDim2.new(1, 0, 0, 25)  -- Reduced height
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "Code Detector"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextScaled = true
+
+    local mapButton = Instance.new("TextButton", mainFrame)
+    mapButton.Size = UDim2.new(1, -10, 0, 25)  -- Further reduced height
+    mapButton.Position = UDim2.new(0, 5, 0, 30)
+    mapButton.Text = "Check Map"
+    mapButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    mapButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    mapButton.BorderSizePixel = 0
+    mapButton.TextScaled = true
+
+    local codeButton = Instance.new("TextButton", mainFrame)
+    codeButton.Size = UDim2.new(1, -10, 0, 25)  -- Further reduced height
+    codeButton.Position = UDim2.new(0, 5, 0, 60)
+    codeButton.Text = "Find Code"
+    codeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    codeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    codeButton.BorderSizePixel = 0
+    codeButton.TextScaled = true
+
+    local closeButton = Instance.new("TextButton", mainFrame)
+    closeButton.Size = UDim2.new(1, -10, 0, 25)  -- Further reduced height
+    closeButton.Position = UDim2.new(0, 5, 0, 90)
+    closeButton.Text = "Close"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    closeButton.BorderSizePixel = 0
+    closeButton.TextScaled = true
+
+    -- Function to check and print the active map from GameMap
+    local function checkActiveMap()
+        local gameMap = Workspace:FindFirstChild("GameProperties") and Workspace.GameProperties:FindFirstChild("GameMap")
+        
+        if gameMap then
+            StarterGui:SetCore("SendNotification", {
+                Title = "Active Map",
+                Text = "Active map: " .. tostring(gameMap.Value),
+                Duration = 5
+            })
+        else
+            StarterGui:SetCore("SendNotification", {
+                Title = "Error",
+                Text = "GameMap not found in GameProperties!",
+                Duration = 5
+            })
+        end
+    end
+
+    -- Function to get the combination code from the buttons
+    local function getCombinationCode()
+        local buttons = {
+            Workspace.GameKeeper.Puzzles.CombinationPuzzle.CombinationKey.Buttons.Button1.ButtonLabel.Label,
+            Workspace.GameKeeper.Puzzles.CombinationPuzzle.CombinationKey.Buttons.Button2.ButtonLabel.Label,
+            Workspace.GameKeeper.Puzzles.CombinationPuzzle.CombinationKey.Buttons.Button3.ButtonLabel.Label,
+        }
+
+        local code = ""
+        for _, button in ipairs(buttons) do
+            if button and tonumber(button.Text) then
+                code = code .. button.Text
+            else
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Error",
+                    Text = "Invalid combination code!",
+                    Duration = 5
+                })
+                return
+            end
+        end
+
+        StarterGui:SetCore("SendNotification", {
+            Title = "Combination Code",
+            Text = "Code: " .. code,
+            Duration = 5
+        })
+    end
+
+    -- Button Events
+    mapButton.MouseButton1Click:Connect(checkActiveMap)
+    codeButton.MouseButton1Click:Connect(getCombinationCode)
+    closeButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+    end)
+end
+
+-- Recreate the GUI every time it's removed
+createGUI()
+Players.LocalPlayer.PlayerGui.ChildRemoved:Connect(function(child)
+    if child.Name == "CodeDetectorGUI" then
+        createGUI()
+    end
+end)
